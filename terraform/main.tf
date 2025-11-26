@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.0.0"
 
   backend "s3" {
-    bucket         = "vasu-terraform-state-123456"  # <-- change to your real bucket name
+    bucket         = "vasu-terraform-state-11262025"  # <-- change to your real bucket name
     key            = "ec2-app/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "terraform-locks"
