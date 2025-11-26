@@ -65,4 +65,6 @@ jobs:
           TF_VAR_dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
           TF_VAR_image_name: "java-ec2-demo"
           TF_VAR_image_tag: "latest"
+          # New: pass commit SHA to Terraform so deploy_version changes every push
+          TF_VAR_deploy_version: ${{ github.sha }}
         run: terraform apply -auto-approve -input=false
