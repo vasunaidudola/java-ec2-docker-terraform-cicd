@@ -10,7 +10,7 @@ public class DemoApplication {
 
     @GetMapping("/")
     public String hello() {
-        return "Hello Accenture";
+        return "This Lab is - Deployment of Java based application in EC2 by using Docker Image";
     }
 
     public static void main(String[] args) {
