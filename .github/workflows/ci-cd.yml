@@ -57,7 +57,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Apply
         env:
@@ -65,4 +65,4 @@ jobs:
           TF_VAR_dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
           TF_VAR_image_name: "java-ec2-demo"
           TF_VAR_image_tag: "latest"
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -input=false
