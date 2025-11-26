@@ -1,7 +1,7 @@
 variable "aws_region" {
   type        = string
   description = "AWS Region"
-  default     = "us-east-1"
+  default     = "ap-south-1"
 }
 
 variable "dockerhub_username" {
@@ -19,4 +19,11 @@ variable "image_tag" {
   type        = string
   description = "Docker image tag"
   default     = "latest"
+}
+
+# New variable to force redeploy when code changes
+variable "deploy_version" {
+  type        = string
+  description = "Forces EC2 replacement when app version changes"
+  default     = ""
 }
