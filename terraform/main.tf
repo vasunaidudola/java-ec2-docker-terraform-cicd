@@ -13,14 +13,20 @@ provider "aws" {
   region = var.aws_region
 }
 
+# Get Default VPC
 data "aws_vpc" "default" {
   default = true
 }
 
-data "aws_subnet_ids" "default" {
-  vpc_id = data.aws_vpc.default.id
+# Get Subnets in Default VPC (Updated Data Source)
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
 }
 
+# Security group to allow HTTP
 resource "aws_security_group" "web_sg" {
   name        = "java-docker-ec2-sg"
   description = "Allow HTTP"
@@ -41,10 +47,10 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
+# Get Amazon Linux 2 AMI
 data "aws_ami" "amazon_linux2" {
   most_recent = true
-
-  owners = ["amazon"]
+  owners      = ["amazon"]
 
   filter {
     name   = "name"
@@ -52,10 +58,14 @@ data "aws_ami" "amazon_linux2" {
   }
 }
 
+# EC2 Instance
 resource "aws_instance" "java_app" {
   ami                    = data.aws_ami.amazon_linux2.id
   instance_type          = "t2.micro"
-  subnet_id              = data.aws_subnet_ids.default.ids[0]
+
+  # Updated subnet reference
+  subnet_id              = data.aws_subnets.default.ids[0]
+
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   user_data = templatefile("${path.module}/user_data.sh", {
@@ -69,6 +79,7 @@ resource "aws_instance" "java_app" {
   }
 }
 
+# Output Public IP
 output "instance_public_ip" {
   value = aws_instance.java_app.public_ip
 }
