@@ -1,6 +1,14 @@
 terraform {
   required_version = ">= 1.0.0"
 
+  backend "s3" {
+    bucket         = "vasu-terraform-state-11262025"  # <-- your bucket
+    key            = "ec2-app/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
+  }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -13,12 +21,12 @@ provider "aws" {
   region = var.aws_region
 }
 
-# Get Default VPC
+# Default VPC
 data "aws_vpc" "default" {
   default = true
 }
 
-# Get Subnets in Default VPC (Updated Data Source)
+# Subnets in default VPC (new data source)
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"
@@ -47,7 +55,7 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-# Get Amazon Linux 2 AMI
+# Amazon Linux 2 AMI
 data "aws_ami" "amazon_linux2" {
   most_recent = true
   owners      = ["amazon"]
@@ -58,14 +66,11 @@ data "aws_ami" "amazon_linux2" {
   }
 }
 
-# EC2 Instance
+# EC2 instance
 resource "aws_instance" "java_app" {
   ami                    = data.aws_ami.amazon_linux2.id
   instance_type          = "t2.micro"
-
-  # Updated subnet reference
   subnet_id              = data.aws_subnets.default.ids[0]
-
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   user_data = templatefile("${path.module}/user_data.sh", {
@@ -79,7 +84,7 @@ resource "aws_instance" "java_app" {
   }
 }
 
-# Output Public IP
+# Output
 output "instance_public_ip" {
   value = aws_instance.java_app.public_ip
 }
